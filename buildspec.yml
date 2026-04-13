@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 248189947068.dkr.ecr.us-east-1.amazonaws.com
+      - aws eks update-kubeconfig --name dataiesb-cluster --region us-east-1
+  build:
+    commands:
+      - docker build -t 248189947068.dkr.ecr.us-east-1.amazonaws.com/aurya-frontend:latest .
+  post_build:
+    commands:
+      - docker push 248189947068.dkr.ecr.us-east-1.amazonaws.com/aurya-frontend:latest
+      - kubectl rollout restart deployment aurya-frontend -n custom
+      - kubectl rollout status deployment aurya-frontend -n custom --timeout=120s
