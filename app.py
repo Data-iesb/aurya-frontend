@@ -3,7 +3,6 @@
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
 import asyncio
 import websockets
 import json
@@ -1120,21 +1119,16 @@ def render_messages():
     # Âncora invisível no final das mensagens
     st.markdown('<div id="end-of-messages"></div>', unsafe_allow_html=True)
 
-    # Força scroll para o final usando componente HTML com JavaScript
-    # Este método é mais confiável pois o componente é carregado após todo o conteúdo
-    components.html(
+    # Força scroll para o final
+    st.markdown(
         """
         <script>
-            // Aguarda um momento para garantir que todo o DOM foi carregado
             setTimeout(function() {
-                // Tenta acessar a janela pai (onde o Streamlit está)
-                if (window.parent) {
-                    window.parent.document.getElementById('end-of-messages')?.scrollIntoView({behavior: 'smooth', block: 'end'});
-                }
+                document.getElementById('end-of-messages')?.scrollIntoView({behavior: 'smooth', block: 'end'});
             }, 100);
         </script>
         """,
-        height=0,
+        unsafe_allow_html=True,
     )
 
 def add_message(role: str, content: str, metadata: Dict = None):
@@ -1219,7 +1213,12 @@ def main():
     # Processa mensagem que está em processamento
     if st.session_state.get('is_processing', False):
         # Pega a última mensagem do usuário
-        last_user_msg = [msg for msg in st.session_state.messages if msg["role"] == "user"][-1]["content"]
+        user_msgs = [msg for msg in st.session_state.messages if msg["role"] == "user"]
+        if not user_msgs:
+            st.session_state.is_processing = False
+            st.rerun()
+            return
+        last_user_msg = user_msgs[-1]["content"]
 
         # Envia para API
         response = run_async_send_message(last_user_msg, st.session_state.session_id)
