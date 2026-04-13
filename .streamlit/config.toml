@@ -11,9 +11,9 @@ serverAddress = "0.0.0.0"
 
 [theme]
 primaryColor = "#E30613"
-backgroundColor = "#1a1a2e"
-secondaryBackgroundColor = "#16213e"
-textColor = "#e0e0e0"
+backgroundColor = "#f5f5f5"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#1f2937"
 font = "sans serif"
 
 [client]
