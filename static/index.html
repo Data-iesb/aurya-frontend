@@ -97,9 +97,13 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 #input-bar{display:flex;padding:.6rem .75rem;border-top:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);gap:.4rem}
 #input-bar input{flex:1;padding:.55rem .85rem;border:1px solid var(--border);border-radius:.5rem;font-size:.9rem;font-family:'Inter',sans-serif;outline:none;background:rgba(0,0,0,.3);color:var(--text);transition:border-color .2s}
 #input-bar input:focus{border-color:var(--red);box-shadow:0 0 12px rgba(227,6,19,.2),inset 0 0 8px rgba(227,6,19,.05)}
-#input-bar button{padding:.55rem 1.25rem;background:var(--red);color:#fff;border:none;border-radius:.5rem;font-size:.85rem;font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s}
+#input-bar button{padding:.55rem 1.25rem;background:var(--red);color:#fff;border:none;border-radius:.5rem;font-size:.85rem;font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s;flex-shrink:0}
 #input-bar button:hover{background:var(--red-light)}
 #input-bar button:disabled{opacity:.5;cursor:default}
+#expand-toggle{display:none;padding:.2rem;background:none;color:var(--red);border:none;font-size:.6rem;cursor:pointer;transition:color .2s,transform .3s;flex-shrink:0}
+#expand-toggle:hover{color:var(--red-light)}
+body.chat-full #diagram,body.chat-full #mobile-cards{display:none!important}
+body.chat-full #expand-toggle{transform:rotate(180deg)}
 
 /* ── Mobile tabs (mobile only) ── */
 #mobile-cards{display:none;flex-shrink:0;padding:.4rem .75rem}
@@ -122,7 +126,9 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
   #chat-area{flex:1;min-height:0;background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;z-index:6;order:2}
   #chat-area.active{flex:1;background:rgba(10,10,10,.92)}
   .msg{max-width:88%}
-  #input-bar{background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;z-index:6;order:1;border-top:none;border-bottom:1px solid var(--border)}
+  #input-bar{background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;z-index:6;order:1;border-top:none;border-bottom:1px solid var(--border);padding:.3rem .2rem;gap:.2rem}
+  #input-bar button#send{background:rgba(0,0,0,.85);color:var(--red)}
+  #expand-toggle{display:block}
 }
 @media(max-height:500px) and (orientation:landscape){
   #topbar nav{display:none}#topbar{padding:.5rem 1rem}
@@ -166,6 +172,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 </div>
 
 <div id="input-bar">
+  <button id="expand-toggle" aria-label="Expandir chat">▲</button>
   <input id="msg" type="text" placeholder="Pergunte sobre dados públicos brasileiros..." autocomplete="off">
   <button id="send">Enviar</button>
 </div>
@@ -273,6 +280,7 @@ function addMsg(text, cls) {
 
 input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
 btn.addEventListener('click', send);
+document.getElementById('expand-toggle').addEventListener('click', () => document.body.classList.toggle('chat-full'));
 if (window.innerWidth <= 600) { chatArea.classList.add('active'); chatActive = true; }
 connect();
 </script>
