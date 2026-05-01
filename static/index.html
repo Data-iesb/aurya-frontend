@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurya</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#2e2e2e;--surface:rgba(30,30,30,.8);--surface-card:rgba(255,255,255,.06);--border:rgba(255,255,255,.07);--text:#c8c8c8;--muted:#888;--accent:rgba(227,6,19,.3);--glow:rgba(227,6,19,.6);--red:#E30613;--red-light:#ff4d5a}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4a2028,#8a8a8a,#5a3035,#3a3a3a);background-size:400% 400%;animation:gradShift 36s linear infinite;color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Top bar ── */
+#topbar{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;background:rgba(18,18,20,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:20;flex-shrink:0}
+#topbar .brand{display:flex;align-items:center;gap:.6rem}
+#topbar .brand img{height:32px;width:auto}
+#topbar .brand-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.12em;color:#c8c8c8}
+#topbar nav{display:flex;gap:1.5rem}
+#topbar nav a{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s;letter-spacing:.02em}
+#topbar nav a:hover,#topbar nav a.active{color:var(--red-light)}
+#topbar .status{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--muted)}
+#topbar .status-dot{width:7px;height:7px;border-radius:50%;background:#555;flex-shrink:0;transition:background .3s}
+#topbar .status-dot.online{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+@media(max-width:600px){#topbar nav{display:none}#topbar{padding:.5rem 1rem}}
+
+/* ── Diagram ── */
+#diagram{flex:1;position:relative;display:flex;align-items:center;justify-content:center;transition:all .6s ease;overflow:hidden}
+
+/* ── Hub ── */
+.hub{position:absolute;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(60,60,60,.95),rgba(25,25,25,.95));border:2.5px solid rgba(227,6,19,.18);display:flex;align-items:center;justify-content:center;z-index:3;animation:breathe 6s ease-in-out infinite;box-shadow:0 0 60px rgba(227,6,19,.06),0 0 120px rgba(227,6,19,.02),inset 0 1px 0 rgba(255,255,255,.08)}
+.hub::before,.hub::after{content:'';position:absolute;top:50%;left:50%;border-radius:50%;border:4px solid transparent}
+.hub::before{width:210px;height:210px;margin:-105px 0 0 -105px;border-top-color:rgba(227,6,19,.2);border-right-color:rgba(227,6,19,.06);animation:spin 20s linear infinite}
+.hub::after{width:280px;height:280px;margin:-140px 0 0 -140px;border-top-color:rgba(227,6,19,.14);border-left-color:rgba(255,77,90,.05);animation:spin 30s linear infinite reverse}
+.hub-label{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.2em;background:linear-gradient(135deg,#ccc,var(--red-light));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
+
+/* ── Rings ── */
+.ring{position:absolute;top:50%;left:50%;border-radius:50%;border:2.5px solid transparent;pointer-events:none}
+.ring-1{width:360px;height:360px;margin:-180px 0 0 -180px;border-top-color:rgba(227,6,19,.1);border-bottom-color:rgba(227,6,19,.03);animation:spin 25s linear infinite}
+.ring-2{width:440px;height:440px;margin:-220px 0 0 -220px;border-right-color:rgba(255,77,90,.09);border-left-color:rgba(227,6,19,.03);animation:spin 35s linear infinite reverse}
+.ring-3{width:420px;height:420px;margin:-210px 0 0 -210px;border-top-color:rgba(227,6,19,.07);animation:spin 45s linear infinite}
+.ring-4{width:480px;height:480px;margin:-240px 0 0 -240px;border-bottom-color:rgba(255,77,90,.06);border-right-color:rgba(227,6,19,.02);animation:spin 55s linear infinite reverse}
+
+/* ── Cards ── */
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;text-align:center;padding:1.15rem 1.35rem;background:rgba(20,20,22,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:16px;z-index:2;width:178px;transition:all .4s cubic-bezier(.25,.8,.25,1);box-shadow:0 4px 24px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.03);opacity:0;animation:cardIn .7s ease forwards}
+.node::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:1px;background:linear-gradient(135deg,var(--card-accent,.5),transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;transition:opacity .4s ease;pointer-events:none}
+.node:hover{border-color:transparent;box-shadow:0 8px 40px var(--card-glow,rgba(227,6,19,.12)),0 0 20px var(--card-glow,rgba(227,6,19,.06)),inset 0 1px 0 rgba(255,255,255,.05);transform:translateY(-4px) scale(1.04)}
+.node:hover::before{opacity:1}
+.node-icon{width:42px;height:42px;margin-bottom:.5rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));transition:transform .4s ease;object-fit:contain}
+.node:hover .node-icon{transform:scale(1.15)}
+.node-label{font-family:'Space Grotesk',sans-serif;font-size:.88rem;font-weight:700;color:#d0d0d0;letter-spacing:.04em}
+.node-desc{font-family:'Inter',sans-serif;font-size:.68rem;font-weight:400;color:var(--muted);margin-top:.3rem;line-height:1.5;letter-spacing:.02em;opacity:.8}
+
+/* ── Per-card accent colors ── */
+.node-0{--card-accent:rgba(59,130,246,.5);--card-glow:rgba(59,130,246,.12);top:8%;left:8%;animation-delay:.1s}
+.node-1{--card-accent:rgba(239,68,68,.5);--card-glow:rgba(239,68,68,.12);top:8%;right:8%;animation-delay:.2s}
+.node-2{--card-accent:rgba(168,85,247,.5);--card-glow:rgba(168,85,247,.12);bottom:8%;right:8%;animation-delay:.3s}
+.node-3{--card-accent:rgba(34,197,94,.5);--card-glow:rgba(34,197,94,.12);bottom:8%;left:8%;animation-delay:.4s}
+.node-4{--card-accent:rgba(245,158,11,.5);--card-glow:rgba(245,158,11,.12);top:50%;left:3%;transform:translateY(-50%);animation-delay:.5s}
+.node-5{--card-accent:rgba(6,182,212,.5);--card-glow:rgba(6,182,212,.12);top:50%;right:3%;transform:translateY(-50%);animation-delay:.6s}
+.node-4:hover{transform:translateY(-50%) translateY(-4px) scale(1.04)}
+.node-5:hover{transform:translateY(-50%) translateY(-4px) scale(1.04)}
+
+@keyframes cardIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.node-4{animation-name:cardInSide}
+.node-5{animation-name:cardInSide}
+@keyframes cardInSide{from{opacity:0;transform:translateY(-50%) translateX(-12px) scale(.95)}to{opacity:1;transform:translateY(-50%) translateX(0) scale(1)}}
+
+/* ── Lines ── */
+.line{position:absolute;top:50%;left:50%;height:1px;background:linear-gradient(90deg,rgba(227,6,19,.25),rgba(255,77,90,.05));transform-origin:0 0;z-index:1}
+.line::after{content:'';position:absolute;top:-1px;left:0;width:16px;height:3px;border-radius:2px;background:var(--glow);animation:pulse 5s ease-in-out infinite}
+.line-0::after{animation-delay:0s}
+.line-1::after{animation-delay:.8s}
+.line-2::after{animation-delay:1.6s}
+.line-3::after{animation-delay:2.4s}
+.line-4::after{animation-delay:3.2s}
+.line-5::after{animation-delay:4s}
+
+@keyframes breathe{0%,100%{box-shadow:0 0 40px rgba(227,6,19,.04),0 0 80px rgba(255,77,90,.02)}50%{box-shadow:0 0 70px rgba(227,6,19,.08),0 0 120px rgba(255,77,90,.04)}}
+@keyframes gradShift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes pulse{0%{left:0;opacity:0}20%{opacity:1}80%{opacity:1}100%{left:calc(100% - 16px);opacity:0}}
+@keyframes botGlow{0%{box-shadow:0 0 8px rgba(227,6,19,.05)}100%{box-shadow:0 0 16px rgba(227,6,19,.12)}}
+@keyframes scanline{0%{top:0}100%{top:100%}}
+@keyframes dotPulse{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+/* ── Chat ── */
+#diagram.half{flex:1}
+#chat-area{display:flex;flex-direction:column;transition:all .6s ease;flex:0;min-height:0;position:relative;z-index:10}
+#chat-area.active{flex:1;min-height:0;background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(227,6,19,.3);box-shadow:inset 0 1px 30px rgba(227,6,19,.05)}
+#messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.5rem}
+.msg{max-width:70%;padding:.6rem .9rem;border-radius:.75rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;font-size:.9rem;font-family:'Inter',sans-serif}
+.user{align-self:flex-end;background:rgba(80,80,80,.7);color:#e0e0e0;border-bottom-right-radius:.2rem}
+.bot{align-self:flex-start;background:rgba(227,6,19,.04);backdrop-filter:blur(8px);border:1px solid rgba(227,6,19,.15);border-left:2px solid var(--red);border-bottom-left-radius:.2rem;animation:botGlow 3s ease-in-out infinite alternate}
+.bot.loading{color:var(--muted)}
+
+/* ── Input bar ── */
+#input-bar{display:flex;padding:.6rem .75rem;border-top:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);gap:.4rem}
+#input-bar input{flex:1;padding:.55rem .85rem;border:1px solid var(--border);border-radius:.5rem;font-size:.9rem;font-family:'Inter',sans-serif;outline:none;background:rgba(0,0,0,.3);color:var(--text);transition:border-color .2s}
+#input-bar input:focus{border-color:var(--red);box-shadow:0 0 12px rgba(227,6,19,.2),inset 0 0 8px rgba(227,6,19,.05)}
+#input-bar button{padding:.55rem 1.25rem;background:var(--red);color:#fff;border:none;border-radius:.5rem;font-size:.85rem;font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s}
+#input-bar button:hover{background:var(--red-light)}
+#input-bar button:disabled{opacity:.5;cursor:default}
+
+/* ── Mobile tabs (mobile only) ── */
+#mobile-cards{display:none;flex-shrink:0;padding:.4rem .75rem}
+#mobile-cards .mob-tabs{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap}
+#mobile-cards .mob-tab{padding:.5rem .75rem;font-family:'Space Mono',monospace;font-size:.75rem;font-weight:400;text-transform:uppercase;letter-spacing:.05em;color:var(--red-light);border:1px solid var(--border);border-radius:4px;background:rgba(0,0,0,.85);cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+#mobile-cards .mob-tab.active{border-color:var(--red);color:var(--red-light);background:rgba(227,6,19,.08)}
+
+@media(max-width:600px){
+  #topbar nav{display:none}#topbar{padding:.5rem 1rem}
+  #diagram{flex:none;height:180px;overflow:visible;background:transparent;animation:none}
+  #diagram .line,#diagram .node{display:none}
+  #diagram .hub{position:absolute;top:55%;left:50%;transform:translate(-50%,-50%) scale(.65)}
+  #diagram .hub::before,#diagram .hub::after{display:none}
+  #diagram .ring{top:55%;left:50%}
+  #diagram .ring-1{width:200px;height:200px;margin:-100px 0 0 -100px}
+  #diagram .ring-2{width:230px;height:230px;margin:-115px 0 0 -115px}
+  #diagram .ring-3,#diagram .ring-4{display:none}
+  #mobile-cards{display:block;position:relative;z-index:5}
+  body{background:linear-gradient(135deg,#3a3a3a,#4a2028,#8a8a8a,#5a3035,#3a3a3a);background-size:400% 400%;animation:gradShift 36s linear infinite}
+  #chat-area{flex:1;min-height:0;background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;z-index:6}
+  #chat-area.active{flex:1;background:rgba(10,10,10,.92)}
+  .msg{max-width:88%}
+  #input-bar{background:rgba(30,30,30,.95)}
+}
+@media(max-height:500px) and (orientation:landscape){
+  #topbar nav{display:none}#topbar{padding:.5rem 1rem}
+  #mobile-cards{display:block;position:relative;z-index:5}
+  #diagram .line,#diagram .node{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="brand">
+    <img src="https://d28lvm9jkyfotx.cloudfront.net/logo.png" alt="Data IESB">
+  </div>
+  <nav>
+    <a class="active" href="#">Chat</a>
+    <a href="https://dataiesb.com" target="_blank">Data IESB</a>
+    <a href="https://dataiesb.com/quem-somos.html" target="_blank">Quem Somos</a>
+    <a href="https://dataiesb.com/contato.html" target="_blank">Contato</a>
+  </nav>
+  <div class="status">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Conectando...</span>
+  </div>
+</div>
+
+<div id="mobile-cards">
+  <div class="mob-tabs" id="mob-tabs"></div>
+</div>
+
+<div id="diagram">
+  <div class="hub"><span class="hub-label">AURYA</span></div>
+  <div class="ring ring-1"></div>
+  <div class="ring ring-2"></div>
+  <div class="ring ring-3"></div>
+  <div class="ring ring-4"></div>
+</div>
+
+<div id="chat-area">
+  <div id="messages"></div>
+</div>
+
+<div id="input-bar">
+  <input id="msg" type="text" placeholder="Pergunte sobre dados públicos brasileiros..." autocomplete="off">
+  <button id="send">Enviar</button>
+</div>
+
+<script>
+const ICONS_BASE = 'https://d28lvm9jkyfotx.cloudfront.net/icons/';
+const NODES = [
+  {icon:'educacao',    label:'Educação',    desc:'INEP · IDEB · ENEM'},
+  {icon:'saude',       label:'Saúde',       desc:'DATASUS · SUS'},
+  {icon:'demografia',  label:'Demografia',  desc:'IBGE · IDH'},
+  {icon:'economia',    label:'Economia',    desc:'PIB · Emprego'},
+  {icon:'governo',     label:'Governo',     desc:'Transparência'},
+  {icon:'territorio',  label:'Território',  desc:'Geoespacial'}
+];
+
+const diagram = document.getElementById('diagram');
+const chatArea = document.getElementById('chat-area');
+const messages = document.getElementById('messages');
+const input = document.getElementById('msg');
+const btn = document.getElementById('send');
+
+NODES.forEach((n, i) => {
+  const line = document.createElement('div');
+  line.className = `line line-${i}`;
+  diagram.appendChild(line);
+  const node = document.createElement('div');
+  node.className = `node node-${i}`;
+  node.innerHTML = `<img class="node-icon" src="${ICONS_BASE}${n.icon}.png" alt="${n.label}"><span class="node-label">${n.label}</span><span class="node-desc">${n.desc}</span>`;
+  diagram.appendChild(node);
+
+  const tab = document.createElement('button');
+  tab.className = 'mob-tab';
+  tab.textContent = n.label;
+  document.getElementById('mob-tabs').appendChild(tab);
+});
+
+function updateLines() {
+  const dr = diagram.getBoundingClientRect();
+  const hub = diagram.querySelector('.hub').getBoundingClientRect();
+  const hx = hub.left + hub.width/2 - dr.left;
+  const hy = hub.top + hub.height/2 - dr.top;
+  NODES.forEach((_, i) => {
+    const nr = diagram.querySelector(`.node-${i}`).getBoundingClientRect();
+    const nx = nr.left + nr.width/2 - dr.left;
+    const ny = nr.top + nr.height/2 - dr.top;
+    const dx = nx-hx, dy = ny-hy;
+    const line = diagram.querySelector(`.line-${i}`);
+    line.style.transform = `rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
+    line.style.width = `${Math.sqrt(dx*dx+dy*dy)}px`;
+  });
+}
+requestAnimationFrame(() => setTimeout(updateLines, 50));
+window.addEventListener('resize', updateLines);
+
+const WS_BASE = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const SESSION = crypto.randomUUID();
+let ws, pending, chatActive = false;
+
+const dot = document.getElementById('status-dot');
+const stxt = document.getElementById('status-text');
+function setStatus(on){dot.classList.toggle('online',on);stxt.textContent=on?'Conectado':'Reconectando...'}
+
+function connect() {
+  ws = new WebSocket(`${WS_BASE}//${location.host}/v2/ws/${SESSION}`);
+  ws.onopen = () => setStatus(true);
+  ws.onmessage = e => {
+    const data = JSON.parse(e.data);
+    if (pending) { pending.textContent = data.answer || 'Sem resposta.'; pending.classList.remove('loading'); pending = null; }
+    btn.disabled = false; input.focus();
+  };
+  ws.onclose = () => { setStatus(false); setTimeout(connect, 2000); };
+  ws.onerror = () => ws.close();
+}
+
+function activateChat() {
+  if (chatActive) return;
+  chatActive = true;
+  diagram.classList.add('half');
+  chatArea.classList.add('active');
+  setTimeout(updateLines, 700);
+}
+
+function send() {
+  const text = input.value.trim();
+  if (!text || btn.disabled) return;
+  activateChat();
+  addMsg(text, 'user');
+  pending = addMsg('', 'bot loading');
+  pending.innerHTML = '<span style="font-family:Space Mono,monospace;font-size:.75rem;letter-spacing:.08em;color:var(--red-light)">AURYA está processando<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>';
+  const dots = pending.querySelectorAll('.dots span');
+  dots.forEach((d,i) => { d.style.cssText = `animation:dotPulse 1.2s ${i*.3}s ease-in-out infinite;opacity:.3`; });
+  btn.disabled = true;
+  input.value = '';
+  ws.send(JSON.stringify({ input_string: text }));
+}
+
+function addMsg(text, cls) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  d.textContent = text;
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
+  return d;
+}
+
+input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+btn.addEventListener('click', send);
+if (window.innerWidth <= 600) { chatArea.classList.add('active'); chatActive = true; }
+connect();
+</script>
+</body>
+</html>
