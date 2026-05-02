@@ -53,17 +53,10 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 /* ── Per-card accent colors ── */
 .node-0{--card-accent:rgba(59,130,246,.5);--card-glow:rgba(59,130,246,.12);top:8%;left:8%;animation-delay:.1s}
 .node-1{--card-accent:rgba(239,68,68,.5);--card-glow:rgba(239,68,68,.12);top:8%;right:8%;animation-delay:.2s}
-.node-2{--card-accent:rgba(168,85,247,.5);--card-glow:rgba(168,85,247,.12);bottom:8%;right:8%;animation-delay:.3s}
-.node-3{--card-accent:rgba(34,197,94,.5);--card-glow:rgba(34,197,94,.12);bottom:8%;left:8%;animation-delay:.4s}
-.node-4{--card-accent:rgba(245,158,11,.5);--card-glow:rgba(245,158,11,.12);top:50%;left:3%;transform:translateY(-50%);animation-delay:.5s}
-.node-5{--card-accent:rgba(6,182,212,.5);--card-glow:rgba(6,182,212,.12);top:50%;right:3%;transform:translateY(-50%);animation-delay:.6s}
-.node-4:hover{transform:translateY(-50%) translateY(-4px) scale(1.04)}
-.node-5:hover{transform:translateY(-50%) translateY(-4px) scale(1.04)}
+.node-2{--card-accent:rgba(168,85,247,.5);--card-glow:rgba(168,85,247,.12);bottom:8%;left:8%;animation-delay:.3s}
+.node-3{--card-accent:rgba(34,197,94,.5);--card-glow:rgba(34,197,94,.12);bottom:8%;right:8%;animation-delay:.4s}
 
 @keyframes cardIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.node-4{animation-name:cardInSide}
-.node-5{animation-name:cardInSide}
-@keyframes cardInSide{from{opacity:0;transform:translateY(-50%) translateX(-12px) scale(.95)}to{opacity:1;transform:translateY(-50%) translateX(0) scale(1)}}
 
 /* ── Lines ── */
 .line{position:absolute;top:50%;left:50%;height:1px;background:linear-gradient(90deg,rgba(227,6,19,.25),rgba(255,77,90,.05));transform-origin:0 0;z-index:1}
@@ -72,8 +65,6 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 .line-1::after{animation-delay:.8s}
 .line-2::after{animation-delay:1.6s}
 .line-3::after{animation-delay:2.4s}
-.line-4::after{animation-delay:3.2s}
-.line-5::after{animation-delay:4s}
 
 @keyframes breathe{0%,100%{box-shadow:0 0 40px rgba(227,6,19,.04),0 0 80px rgba(255,77,90,.02)}50%{box-shadow:0 0 70px rgba(227,6,19,.08),0 0 120px rgba(255,77,90,.04)}}
 @keyframes gradShift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
@@ -92,6 +83,11 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 .user{align-self:flex-end;background:rgba(80,80,80,.7);color:#e0e0e0;border-bottom-right-radius:.2rem}
 .bot{align-self:flex-start;background:rgba(227,6,19,.04);backdrop-filter:blur(8px);border:1px solid rgba(227,6,19,.15);border-left:2px solid var(--red);border-bottom-left-radius:.2rem;animation:botGlow 3s ease-in-out infinite alternate}
 .bot.loading{color:var(--muted)}
+.bot .aurya-metric{text-align:center;margin:.6rem 0;padding:.8rem;background:rgba(227,6,19,.06);border:1px solid rgba(227,6,19,.2);border-radius:8px}
+.bot .aurya-metric .value{font-size:1.6rem;font-weight:700;color:var(--red-light);font-family:'Space Grotesk',sans-serif;letter-spacing:.5px}
+.bot .aurya-metric .label{font-size:.8rem;color:var(--muted);margin-top:.15rem}
+.bot .aurya-title{font-size:.95rem;font-weight:600;color:var(--red-light);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+.bot .aurya-detail{font-size:.85rem;color:#b0b0b0;line-height:1.6;border-left:2px solid rgba(227,6,19,.3);padding-left:.7rem;margin-top:.5rem}
 
 /* ── Input bar ── */
 #input-bar{display:flex;padding:.6rem .75rem;border-top:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);gap:.4rem}
@@ -135,6 +131,13 @@ body.chat-full #expand-toggle{transform:rotate(180deg)}
   #mobile-cards{display:block;position:relative;z-index:5}
   #diagram .line,#diagram .node{display:none}
 }
+#q-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:qFadeIn .25s ease}
+.q-panel{background:rgba(20,20,22,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.5rem;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 60px rgba(227,6,19,.06),inset 0 1px 0 rgba(255,255,255,.04);animation:qSlideUp .3s cubic-bezier(.25,.8,.25,1)}
+.q-panel h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.1em;margin:0 0 1rem;background:linear-gradient(135deg,#ccc,var(--red-light));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.q-opt{display:block;width:100%;text-align:left;padding:.7rem 1rem;margin:.35rem 0;background:rgba(255,255,255,.03);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);border-radius:10px;color:var(--text);font-size:.88rem;font-family:'Inter',sans-serif;line-height:1.5;cursor:pointer;transition:all .3s cubic-bezier(.25,.8,.25,1);box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.q-opt:hover{border-color:rgba(227,6,19,.4);background:rgba(227,6,19,.06);box-shadow:0 4px 20px rgba(227,6,19,.08),inset 0 1px 0 rgba(255,255,255,.03);transform:translateX(4px);color:var(--red-light)}
+@keyframes qFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes qSlideUp{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 </style>
 </head>
 <body>
@@ -145,7 +148,6 @@ body.chat-full #expand-toggle{transform:rotate(180deg)}
   </div>
   <nav>
     <a class="active" href="#">Chat</a>
-    <a href="https://dataiesb.com" target="_blank">Data IESB</a>
     <a href="https://dataiesb.com/quem-somos.html" target="_blank">Quem Somos</a>
     <a href="https://dataiesb.com/contato.html" target="_blank">Contato</a>
   </nav>
@@ -180,12 +182,10 @@ body.chat-full #expand-toggle{transform:rotate(180deg)}
 <script>
 const ICONS_BASE = 'https://d28lvm9jkyfotx.cloudfront.net/icons/';
 const NODES = [
-  {icon:'educacao',    label:'Educação',    desc:'INEP · IDEB · ENEM'},
-  {icon:'saude',       label:'Saúde',       desc:'DATASUS · SUS'},
-  {icon:'demografia',  label:'Demografia',  desc:'IBGE · IDH'},
-  {icon:'economia',    label:'Economia',    desc:'PIB · Emprego'},
-  {icon:'governo',     label:'Governo',     desc:'Transparência'},
-  {icon:'territorio',  label:'Território',  desc:'Geoespacial'}
+  {icon:'educacao',    label:'Educação',    desc:'Censo Escolar · ENEM · Superior',  questions:['Quantas escolas públicas existem por estado?','Qual a média do ENEM por região?','Quais áreas de conhecimento têm mais vagas no ensino superior?']},
+  {icon:'saude',       label:'Saúde',       desc:'SUS · AIH · Ambulatorial',         questions:['Qual o total investido pelo SUS em internações por ano?','Quais estados gastam mais com o SUS?','Quanto o SUS gastou em cirurgias vs procedimentos clínicos por ano?']},
+  {icon:'demografia',  label:'Demografia',  desc:'IBGE · Censo 2022',                questions:['Qual a população por região?','Qual o percentual de idosos por estado?','Quais capitais têm maior população?']},
+  {icon:'governo',     label:'Segurança',   desc:'Trânsito · Ocorrências',           questions:['Quantos acidentes com óbito por estado?','Quais tipos de ocorrência criminal são mais frequentes?','Quais municípios têm mais óbitos em acidentes?']}
 ];
 
 const diagram = document.getElementById('diagram');
@@ -201,11 +201,14 @@ NODES.forEach((n, i) => {
   const node = document.createElement('div');
   node.className = `node node-${i}`;
   node.innerHTML = `<img class="node-icon" src="${ICONS_BASE}${n.icon}.png" alt="${n.label}"><span class="node-label">${n.label}</span><span class="node-desc">${n.desc}</span>`;
+  node.style.cursor = 'pointer';
+  node.addEventListener('click', () => showQuestions(n));
   diagram.appendChild(node);
 
   const tab = document.createElement('button');
   tab.className = 'mob-tab';
   tab.textContent = n.label;
+  tab.addEventListener('click', () => showQuestions(n));
   document.getElementById('mob-tabs').appendChild(tab);
 });
 
@@ -236,11 +239,11 @@ const stxt = document.getElementById('status-text');
 function setStatus(on){dot.classList.toggle('online',on);stxt.textContent=on?'Conectado':'Reconectando...'}
 
 function connect() {
-  ws = new WebSocket(`${WS_BASE}//${location.host}/v2/ws/${SESSION}`);
+  ws = new WebSocket(`${WS_BASE}//${location.host}/ws/${SESSION}`);
   ws.onopen = () => setStatus(true);
   ws.onmessage = e => {
     const data = JSON.parse(e.data);
-    if (pending) { pending.textContent = data.answer || 'Sem resposta.'; pending.classList.remove('loading'); pending = null; }
+    if (pending) { const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); pending = null; }
     btn.disabled = false; input.focus();
   };
   ws.onclose = () => { setStatus(false); setTimeout(connect, 2000); };
@@ -253,6 +256,17 @@ function activateChat() {
   diagram.classList.add('half');
   chatArea.classList.add('active');
   setTimeout(updateLines, 700);
+}
+
+function showQuestions(node) {
+  let overlay = document.getElementById('q-overlay');
+  if (overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'q-overlay';
+  overlay.innerHTML = `<div class="q-panel"><h3>${node.label}</h3>${node.questions.map(q => `<button class="q-opt">${q}</button>`).join('')}</div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  overlay.querySelectorAll('.q-opt').forEach(b => b.addEventListener('click', () => { overlay.remove(); input.value = b.textContent; send(); }));
+  document.body.appendChild(overlay);
 }
 
 function send() {
@@ -269,10 +283,34 @@ function send() {
   ws.send(JSON.stringify({ input_string: text }));
 }
 
+function enhanceOutput(text) {
+  const lines = text.trim().split('\n');
+  let title = '', metric = '', metricLabel = '', details = [];
+  const icons = {sus:'🏥',saúde:'🏥',saude:'🏥',educa:'🎓',inep:'🎓',enem:'🎓',ideb:'🎓',popul:'👥',demog:'👥',ibge:'👥',idh:'👥'};
+  for (const line of lines) {
+    const tm = line.match(/^#{1,2}\s+(.+)/);
+    if (tm && !title) { title = tm[1]; continue; }
+    const mm = line.match(/\*\*([0-9][0-9.,]+)\s*(.*?)\*\*/);
+    if (mm && !metric) { metric = mm[1]; metricLabel = mm[2] || line.replace(/\*\*[^*]+\*\*/, '').replace(/^[,.\s]+|[,.\s]+$/g, ''); continue; }
+    if (line.trim()) details.push(line.trim());
+  }
+  if (!title && !metric) return null;
+  let icon = '📊';
+  if (title) { const t = title.toLowerCase(); for (const [k,v] of Object.entries(icons)) { if (t.includes(k)) { icon = v; break; } } }
+  let html = '';
+  if (title) html += `<div class="aurya-title">${icon} ${title}</div>`;
+  if (metric) html += `<div class="aurya-metric"><div class="value">${metric}</div><div class="label">${metricLabel}</div></div>`;
+  if (details.length) html += `<div class="aurya-detail">${details.join('<br>')}</div>`;
+  return html;
+}
+
 function addMsg(text, cls) {
   const d = document.createElement('div');
   d.className = 'msg ' + cls;
-  d.textContent = text;
+  if (cls.includes('bot') && text) {
+    const enhanced = enhanceOutput(text);
+    if (enhanced) d.innerHTML = enhanced; else d.textContent = text;
+  } else { d.textContent = text; }
   messages.appendChild(d);
   messages.scrollTop = messages.scrollHeight;
   return d;
