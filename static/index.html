@@ -355,9 +355,11 @@ async function ttsToggle(btn, text) {
   if (_ttsAudio && !_ttsAudio.paused) { _ttsAudio.pause(); _ttsAudio = null; btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; return; }
   btn.classList.add('playing'); btn.textContent='⏳';
   try {
-    const res = await fetch('/tts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text})});
-    const {url} = await res.json();
-    _ttsAudio = new Audio(url);
+    const res = await fetch('/tts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text}), credentials:'same-origin'});
+    if (!res.ok) throw new Error('TTS failed');
+    const data = await res.json();
+    if (!data.url) throw new Error('No URL');
+    _ttsAudio = new Audio(data.url);
     _ttsAudio.onended = () => { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; _ttsAudio = null; };
     btn.textContent='⏹ Parar';
     _ttsAudio.play();
