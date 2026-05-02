@@ -353,11 +353,11 @@ function ttsText(raw) {
 let _ttsAudio = null;
 async function ttsToggle(btn, text) {
   if (_ttsAudio && !_ttsAudio.paused) { _ttsAudio.pause(); _ttsAudio = null; btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; return; }
-  btn.classList.add('playing'); btn.textContent='⏳ Carregando';
+  btn.classList.add('playing'); btn.textContent='⏳';
   try {
     const res = await fetch('/tts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text})});
-    const blob = await res.blob();
-    _ttsAudio = new Audio(URL.createObjectURL(blob));
+    const {url} = await res.json();
+    _ttsAudio = new Audio(url);
     _ttsAudio.onended = () => { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; _ttsAudio = null; };
     btn.textContent='⏹ Parar';
     _ttsAudio.play();
