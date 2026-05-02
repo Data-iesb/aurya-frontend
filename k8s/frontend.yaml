@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aurya-frontend-v2
+  name: aurya-frontend
   namespace: custom
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aurya-frontend-v2
+      app: aurya-frontend
   template:
     metadata:
       labels:
-        app: aurya-frontend-v2
+        app: aurya-frontend
     spec:
       containers:
       - name: frontend
@@ -23,11 +23,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: aurya-frontend-v2-svc
+  name: aurya-frontend-svc
   namespace: custom
 spec:
   selector:
-    app: aurya-frontend-v2
+    app: aurya-frontend
   ports:
   - port: 80
     targetPort: 80

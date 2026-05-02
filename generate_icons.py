@@ -25,7 +25,7 @@ bedrock = boto3.Session(profile_name="iesb").client("bedrock-runtime", region_na
 s3 = boto3.Session(profile_name="iesb").client("s3", region_name="us-east-1")
 
 BUCKET = "aurya.dataiesb.com"
-PREFIX = "v2/icons/"
+PREFIX = "icons/"
 
 for name, desc in ICONS.items():
     prompt = BASE_PROMPT.format(desc=desc)

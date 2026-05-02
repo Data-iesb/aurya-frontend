@@ -3,7 +3,7 @@ headless = true
 port = 8501
 enableCORS = true
 enableXsrfProtection = false
-baseUrlPath = "v2"
+baseUrlPath = ""
 
 [browser]
 gatherUsageStats = false

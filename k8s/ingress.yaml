@@ -16,13 +16,6 @@ spec:
   - host: aurya.dataiesb.com
     http:
       paths:
-      - path: /v2
-        pathType: Prefix
-        backend:
-          service:
-            name: aurya-frontend-v2-svc
-            port:
-              number: 80
       - path: /
         pathType: Prefix
         backend:

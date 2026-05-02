@@ -254,7 +254,7 @@ function connect() {
   ws.onopen = () => setStatus(true);
   ws.onmessage = e => {
     const data = JSON.parse(e.data);
-    if (pending) { if(pending._loadInterval) clearInterval(pending._loadInterval); const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); pending = null; }
+    if (pending) { if(pending._loadInterval) clearInterval(pending._loadInterval); const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); const tb = document.createElement('button'); tb.className='tts-btn'; tb.textContent='🔊 Ouvir'; tb.addEventListener('click', () => ttsToggle(tb, ans)); pending.appendChild(tb); pending = null; }
     btn.disabled = false; input.focus();
   };
   ws.onclose = () => { setStatus(false); setTimeout(connect, 2000); };
@@ -297,7 +297,7 @@ function send() {
   pending = addMsg('', 'bot loading');
   const loadingMsgs = ['Analisando sua pergunta','Consultando o datalake','Processando resultados','Gerando resposta'];
   let li = 0;
-  pending.innerHTML = `<div style="font-family:Space Mono,monospace;font-size:.75rem;letter-spacing:.06em;color:var(--red-light);display:flex;align-items:center;gap:.5rem"><span class="load-icon">⚡</span><span class="load-txt">${loadingMsgs[0]}</span><span class="dots"><span>.</span><span>.</span><span>.</span></span></div>`;
+  pending.innerHTML = `<div style="font-family:Space Mono,monospace;font-size:.75rem;letter-spacing:.06em;color:var(--red-light);display:flex;align-items:center;gap:.5rem"><span class="load-icon" style="display:inline-block;animation:spin 2s linear infinite">⚙️</span><span class="load-txt">${loadingMsgs[0]}</span><span class="dots"><span>.</span><span>.</span><span>.</span></span></div>`;
   const dots = pending.querySelectorAll('.dots span');
   dots.forEach((d,i) => { d.style.cssText = `animation:dotPulse 1.2s ${i*.3}s ease-in-out infinite;opacity:.3`; });
   const loadInterval = setInterval(() => { li = (li+1) % loadingMsgs.length; const t = pending.querySelector('.load-txt'); if(t) t.textContent = loadingMsgs[li]; else clearInterval(loadInterval); }, 2500);
@@ -335,28 +335,33 @@ function fmt(s) { return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').repla
 
 function enhanceOutput(text) {
   const lines = text.trim().split('\n');
-  const hasTitle = lines.some(l => /^#{1,2}\s/.test(l.trim()));
+  const hasTitle = lines.some(l => /^#{1,3}\s/.test(l.trim()));
   const hasTable = lines.some(l => /^\|.+\|$/.test(l.trim()));
   if (!hasTitle && !hasTable) return null;
   let title = '', icon = '📊';
   const icons = {sus:'🏥',saúde:'🏥',saude:'🏥',educa:'🎓',inep:'🎓',enem:'🎓',ideb:'🎓',popul:'👥',demog:'👥',ibge:'👥',idh:'👥',acid:'🚨',crim:'🚨',segur:'🚨',homicíd:'🚨'};
-  const tm = lines.find(l => /^#{1,2}\s/.test(l.trim()));
-  if (tm) { title = tm.trim().replace(/^#{1,2}\s+/,''); const t = title.toLowerCase(); for (const [k,v] of Object.entries(icons)) { if (t.includes(k)) { icon = v; break; } } }
+  const tm = lines.find(l => /^#{1,3}\s/.test(l.trim()));
+  if (tm) { title = tm.trim().replace(/^#{1,3}\s+/,''); const t = title.toLowerCase(); for (const [k,v] of Object.entries(icons)) { if (t.includes(k)) { icon = v; break; } } }
   let html = title ? `<div class="aurya-title">${icon} ${title}</div>` : '';
-  html += `<div class="aurya-detail">${md(text.replace(/^#{1,2}\s+.+\n?/m,''))}</div>`;
+  html += `<div class="aurya-detail">${md(text.replace(/^#{1,3}\s+.+\n?/m,''))}</div>`;
   return html;
 }
 
 function ttsText(raw) {
   return raw.replace(/\|[^\n]+\|/g,'').replace(/[-]{2,}/g,'').replace(/#{1,3}\s*/g,'').replace(/\*\*/g,'').replace(/`[^`]+`/g,'').replace(/\n{2,}/g,'\n').trim();
 }
-function ttsToggle(btn, text) {
-  if (speechSynthesis.speaking) { speechSynthesis.cancel(); btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; return; }
-  const u = new SpeechSynthesisUtterance(ttsText(text));
-  u.lang='pt-BR'; u.rate=1.05;
-  u.onend = () => { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; };
-  btn.classList.add('playing'); btn.textContent='⏹ Parar';
-  speechSynthesis.speak(u);
+let _ttsAudio = null;
+async function ttsToggle(btn, text) {
+  if (_ttsAudio && !_ttsAudio.paused) { _ttsAudio.pause(); _ttsAudio = null; btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; return; }
+  btn.classList.add('playing'); btn.textContent='⏳ Carregando';
+  try {
+    const res = await fetch('/tts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text})});
+    const blob = await res.blob();
+    _ttsAudio = new Audio(URL.createObjectURL(blob));
+    _ttsAudio.onended = () => { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; _ttsAudio = null; };
+    btn.textContent='⏹ Parar';
+    _ttsAudio.play();
+  } catch(e) { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; }
 }
 
 function addMsg(text, cls) {
