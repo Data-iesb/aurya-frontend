@@ -254,7 +254,7 @@ function connect() {
   ws.onopen = () => setStatus(true);
   ws.onmessage = e => {
     const data = JSON.parse(e.data);
-    if (pending) { if(pending._loadInterval) clearInterval(pending._loadInterval); const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); const tb = document.createElement('button'); tb.className='tts-btn'; tb.textContent='🔊 Ouvir'; tb.addEventListener('click', () => ttsToggle(tb, ans)); pending.appendChild(tb); pending = null; }
+    if (pending) { if(pending._loadInterval) clearInterval(pending._loadInterval); const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); const tb = document.createElement('button'); tb.className='tts-btn'; tb.textContent='🔊 Ouvir'; tb.addEventListener('click', () => ttsToggle(tb, ans)); pending.prepend(tb); pending = null; }
     btn.disabled = false; input.focus();
   };
   ws.onclose = () => { setStatus(false); setTimeout(connect, 2000); };
@@ -374,7 +374,7 @@ function addMsg(text, cls) {
     if (enhanced) d.innerHTML = enhanced; else d.textContent = text;
     const tb = document.createElement('button'); tb.className='tts-btn'; tb.textContent='🔊 Ouvir';
     tb.addEventListener('click', () => ttsToggle(tb, text));
-    d.appendChild(tb);
+    d.prepend(tb);
   } else { d.textContent = text; }
   messages.appendChild(d);
   messages.scrollTop = messages.scrollHeight;
