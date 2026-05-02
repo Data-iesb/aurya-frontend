@@ -21,4 +21,4 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - run: aws s3 sync static/ s3://aurya.dataiesb.com/v2/ --delete
+      - run: aws s3 sync static/ s3://aurya.dataiesb.com/ --delete
