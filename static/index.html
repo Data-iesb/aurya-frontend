@@ -88,6 +88,13 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 .bot .aurya-metric .label{font-size:.8rem;color:var(--muted);margin-top:.15rem}
 .bot .aurya-title{font-size:.95rem;font-weight:600;color:var(--red-light);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
 .bot .aurya-detail{font-size:.85rem;color:#b0b0b0;line-height:1.6;border-left:2px solid rgba(227,6,19,.3);padding-left:.7rem;margin-top:.5rem}
+.bot .aurya-detail table{width:100%;border-collapse:collapse;margin:.5rem 0;font-size:.82rem}
+.bot .aurya-detail th{text-align:left;padding:.4rem .6rem;border-bottom:1.5px solid rgba(227,6,19,.3);color:var(--red-light);font-weight:600}
+.bot .aurya-detail td{padding:.35rem .6rem;border-bottom:1px solid rgba(255,255,255,.05)}
+.bot .aurya-detail tr:hover td{background:rgba(227,6,19,.04)}
+.bot .aurya-detail h2,.bot .aurya-detail h3{font-size:.9rem;color:#d0d0d0;margin:.6rem 0 .3rem}
+.bot .aurya-detail p{margin:.3rem 0}
+.bot .aurya-detail code{background:rgba(227,6,19,.1);padding:.1rem .3rem;border-radius:3px;font-family:'Space Mono',monospace;font-size:.8rem}
 
 /* ── Input bar ── */
 #input-bar{display:flex;padding:.6rem .75rem;border-top:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);gap:.4rem}
@@ -293,24 +300,43 @@ function send() {
   ws.send(JSON.stringify({ input_string: text }));
 }
 
+function md(text) {
+  let html = '', inTable = false, rows = [];
+  for (const line of text.split('\n')) {
+    const l = line.trim();
+    if (/^\|(.+)\|$/.test(l)) {
+      if (/^\|[\s\-:|]+\|$/.test(l)) continue;
+      rows.push(l.split('|').slice(1,-1).map(c=>c.trim()));
+      if (!inTable) inTable = true;
+      continue;
+    }
+    if (inTable) { html += renderTable(rows); rows = []; inTable = false; }
+    if (/^#{1,3}\s/.test(l)) { const m = l.match(/^(#{1,3})\s+(.+)/); const t = 'h'+m[1].length; html += `<${t}>${fmt(m[2])}</${t}>`; }
+    else if (l === '') html += '';
+    else html += `<p>${fmt(l)}</p>`;
+  }
+  if (inTable) html += renderTable(rows);
+  return html;
+}
+function renderTable(rows) {
+  if (!rows.length) return '';
+  let h = '<table><thead><tr>' + rows[0].map(c=>`<th>${fmt(c)}</th>`).join('') + '</tr></thead><tbody>';
+  for (let i=1;i<rows.length;i++) h += '<tr>' + rows[i].map(c=>`<td>${fmt(c)}</td>`).join('') + '</tr>';
+  return h + '</tbody></table>';
+}
+function fmt(s) { return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>'); }
+
 function enhanceOutput(text) {
   const lines = text.trim().split('\n');
-  let title = '', metric = '', metricLabel = '', details = [];
-  const icons = {sus:'🏥',saúde:'🏥',saude:'🏥',educa:'🎓',inep:'🎓',enem:'🎓',ideb:'🎓',popul:'👥',demog:'👥',ibge:'👥',idh:'👥'};
-  for (const line of lines) {
-    const tm = line.match(/^#{1,2}\s+(.+)/);
-    if (tm && !title) { title = tm[1]; continue; }
-    const mm = line.match(/\*\*([0-9][0-9.,]+)\s*(.*?)\*\*/);
-    if (mm && !metric) { metric = mm[1]; metricLabel = mm[2] || line.replace(/\*\*[^*]+\*\*/, '').replace(/^[,.\s]+|[,.\s]+$/g, ''); continue; }
-    if (line.trim()) details.push(line.trim());
-  }
-  if (!title && !metric) return null;
-  let icon = '📊';
-  if (title) { const t = title.toLowerCase(); for (const [k,v] of Object.entries(icons)) { if (t.includes(k)) { icon = v; break; } } }
-  let html = '';
-  if (title) html += `<div class="aurya-title">${icon} ${title}</div>`;
-  if (metric) html += `<div class="aurya-metric"><div class="value">${metric}</div><div class="label">${metricLabel}</div></div>`;
-  if (details.length) html += `<div class="aurya-detail">${details.join('<br>')}</div>`;
+  const hasTitle = lines.some(l => /^#{1,2}\s/.test(l.trim()));
+  const hasTable = lines.some(l => /^\|.+\|$/.test(l.trim()));
+  if (!hasTitle && !hasTable) return null;
+  let title = '', icon = '📊';
+  const icons = {sus:'🏥',saúde:'🏥',saude:'🏥',educa:'🎓',inep:'🎓',enem:'🎓',ideb:'🎓',popul:'👥',demog:'👥',ibge:'👥',idh:'👥',acid:'🚨',crim:'🚨',segur:'🚨',homicíd:'🚨'};
+  const tm = lines.find(l => /^#{1,2}\s/.test(l.trim()));
+  if (tm) { title = tm.trim().replace(/^#{1,2}\s+/,''); const t = title.toLowerCase(); for (const [k,v] of Object.entries(icons)) { if (t.includes(k)) { icon = v; break; } } }
+  let html = title ? `<div class="aurya-title">${icon} ${title}</div>` : '';
+  html += `<div class="aurya-detail">${md(text.replace(/^#{1,2}\s+.+\n?/m,''))}</div>`;
   return html;
 }
 
