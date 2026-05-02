@@ -95,6 +95,9 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#3a3a3a,#4
 .bot .aurya-detail h2,.bot .aurya-detail h3{font-size:.9rem;color:#d0d0d0;margin:.6rem 0 .3rem}
 .bot .aurya-detail p{margin:.3rem 0}
 .bot .aurya-detail code{background:rgba(227,6,19,.1);padding:.1rem .3rem;border-radius:3px;font-family:'Space Mono',monospace;font-size:.8rem}
+.tts-btn{display:inline-flex;align-items:center;gap:.3rem;margin-top:.5rem;padding:.3rem .6rem;background:rgba(227,6,19,.08);border:1px solid rgba(227,6,19,.2);border-radius:6px;color:var(--red-light);font-size:.72rem;font-family:'Space Mono',monospace;cursor:pointer;transition:all .2s}
+.tts-btn:hover{background:rgba(227,6,19,.15);border-color:rgba(227,6,19,.4)}
+.tts-btn.playing{background:rgba(227,6,19,.2);border-color:var(--red)}
 
 /* ── Input bar ── */
 #input-bar{display:flex;padding:.6rem .75rem;border-top:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);gap:.4rem}
@@ -344,12 +347,27 @@ function enhanceOutput(text) {
   return html;
 }
 
+function ttsText(raw) {
+  return raw.replace(/\|[^\n]+\|/g,'').replace(/[-]{2,}/g,'').replace(/#{1,3}\s*/g,'').replace(/\*\*/g,'').replace(/`[^`]+`/g,'').replace(/\n{2,}/g,'\n').trim();
+}
+function ttsToggle(btn, text) {
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; return; }
+  const u = new SpeechSynthesisUtterance(ttsText(text));
+  u.lang='pt-BR'; u.rate=1.05;
+  u.onend = () => { btn.classList.remove('playing'); btn.textContent='🔊 Ouvir'; };
+  btn.classList.add('playing'); btn.textContent='⏹ Parar';
+  speechSynthesis.speak(u);
+}
+
 function addMsg(text, cls) {
   const d = document.createElement('div');
   d.className = 'msg ' + cls;
   if (cls.includes('bot') && text) {
     const enhanced = enhanceOutput(text);
     if (enhanced) d.innerHTML = enhanced; else d.textContent = text;
+    const tb = document.createElement('button'); tb.className='tts-btn'; tb.textContent='🔊 Ouvir';
+    tb.addEventListener('click', () => ttsToggle(tb, text));
+    d.appendChild(tb);
   } else { d.textContent = text; }
   messages.appendChild(d);
   messages.scrollTop = messages.scrollHeight;
