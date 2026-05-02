@@ -251,7 +251,7 @@ function connect() {
   ws.onopen = () => setStatus(true);
   ws.onmessage = e => {
     const data = JSON.parse(e.data);
-    if (pending) { const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); pending = null; }
+    if (pending) { if(pending._loadInterval) clearInterval(pending._loadInterval); const ans = data.answer || 'Sem resposta.'; const enh = enhanceOutput(ans); if (enh) pending.innerHTML = enh; else pending.textContent = ans; pending.classList.remove('loading'); pending = null; }
     btn.disabled = false; input.focus();
   };
   ws.onclose = () => { setStatus(false); setTimeout(connect, 2000); };
@@ -292,9 +292,13 @@ function send() {
   activateChat();
   addMsg(text, 'user');
   pending = addMsg('', 'bot loading');
-  pending.innerHTML = '<span style="font-family:Space Mono,monospace;font-size:.75rem;letter-spacing:.08em;color:var(--red-light)">Consultando dados<span class="dots"><span>.</span><span>.</span><span>.</span></span></span>';
+  const loadingMsgs = ['Analisando sua pergunta','Consultando o datalake','Processando resultados','Gerando resposta'];
+  let li = 0;
+  pending.innerHTML = `<div style="font-family:Space Mono,monospace;font-size:.75rem;letter-spacing:.06em;color:var(--red-light);display:flex;align-items:center;gap:.5rem"><span class="load-icon">⚡</span><span class="load-txt">${loadingMsgs[0]}</span><span class="dots"><span>.</span><span>.</span><span>.</span></span></div>`;
   const dots = pending.querySelectorAll('.dots span');
   dots.forEach((d,i) => { d.style.cssText = `animation:dotPulse 1.2s ${i*.3}s ease-in-out infinite;opacity:.3`; });
+  const loadInterval = setInterval(() => { li = (li+1) % loadingMsgs.length; const t = pending.querySelector('.load-txt'); if(t) t.textContent = loadingMsgs[li]; else clearInterval(loadInterval); }, 2500);
+  pending._loadInterval = loadInterval;
   btn.disabled = true;
   input.value = '';
   ws.send(JSON.stringify({ input_string: text }));
